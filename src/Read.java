@@ -10,16 +10,16 @@ import java.util.Scanner;
 public class Read {
     public static Double[] expectedValue;
     public static Double[] variance;
-    public static Double[][] covariance;
-    public static Double[][] correlation;
+    public static double[][] covariance;
+    public static double[][] correlation;
     public static void main(String[] args) {
         try {
             File dailyReturn = new File("/Users/Yuli/Desktop/StockProject/src/DailyReturn.csv");
             Scanner scan = new Scanner(dailyReturn);
             expectedValue = new Double[800];
             variance = new Double[800];
-            covariance = new Double[800][800];
-            correlation = new Double[800][800];
+            covariance = new double[800][800];
+            correlation = new double[800][800];
             String[] lines = new String[800];
             int index = 0;
             while (scan.hasNextLine()) {
@@ -52,9 +52,22 @@ public class Read {
             System.out.println("File not Found");
         }
         try {
+            FileWriter outputCov = new FileWriter("OutputCov");
+            for (int x = 0; x < covariance.length; x++) {
+                for (int y = 0; y < 800; y++) {
+                    outputCov.append(Double.toString(covariance[x][y]));
+                    outputCov.append(",");
+                }
+                outputCov.append("\n");
+            }
+
+        } catch (IOException e) {
+            System.out.println("Exception");
+        }
+        try {
             FileWriter output = new FileWriter("Output");
             for (int x = 0; x < correlation.length; x++) {
-                for (int y = x; y < correlation[x].length; y++) {
+                for (int y = 0; y < correlation[x].length; y++) {
                     output.append(Double.toString(correlation[x][y]));
                     output.append(",");
                 }
@@ -112,8 +125,12 @@ public class Read {
     public static void getCorrelation(String[] lines) {
         for (int x = 0; x < lines.length; x++) {
            for (int y = x; y < lines.length; y++) {
-                correlation[x][y] = covariance[x][y] / (Math.sqrt(variance[x]) * Math.sqrt(variance[y]));
-                correlation[y][x] = correlation[x][y];
+               if (y == x) {
+                   correlation[x][y] = 1;
+               } else {
+                   correlation[x][y] = covariance[x][y] / (Math.sqrt(variance[x]) * Math.sqrt(variance[y]));
+                   correlation[y][x] = correlation[x][y];
+               }
            }
         }
     }
