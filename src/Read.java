@@ -38,21 +38,54 @@ public class Read {
                 System.out.println(variance[i]);
             }
             getCovariance(lines);
-            System.out.println("\nTest covariance");
-            for (int i = 0; i <10; i++) {
-                System.out.println(covariance[0][i]);
-            }
+            // System.out.println("\nTest covariance");
+            // for (int i = 0; i <10; i++) {
+            //     System.out.println(covariance[0][i]);
+            // }
             getCorrelation(lines);
-            System.out.println("\nTest correlation");
-            for (int i = 0; i < 10; i++) {
-                System.out.println(correlation[0][i]);
+            // System.out.println("\nTest correlation");
+            // for (int i = 0; i < 10; i++) {
+            //     System.out.println(correlation[0][i]);
+            // }
+
+            KMeans kmean = new KMeans(correlation);
+            kmean.init();
+            kmean.calculate();
+            System.out.println(kmean.outP);
+            try {
+                FileWriter testing = new FileWriter("outputFile1.txt");
+                testing.write(kmean.getOUTP());
+                testing.close();
+            } catch (IOException e) {
+                System.out.println("Exception");
             }
+            FileWriter write = new FileWriter("Cluster");
+            String[] groups = kmean.getOUTP().trim().split("/n");
+            System.out.println(groups.length);
+            int stoIndex;
+            String[] stoTemp;
+            for (int i = 0; i < groups.length; i++) {
+                int groupNum =  i+1;
+                String name = "Group " + groupNum + "\n";
+                write.write(name);
+                String[] group = groups[i].trim().split(",");
+                for (int j = 0; j < group.length; j++) {
+                    stoIndex = Integer.parseInt(group[j].trim());
+                    stoTemp = lines[stoIndex].split(",");
+                    write.append(stoTemp[0] + ", ");
+                }
+                write.append("\n\n");
+
+            }
+            write.close();
 
         } catch (FileNotFoundException e) {
             System.out.println("File not Found");
+        } catch (IOException e) {
+            System.out.println("IOException");
         }
         try {
-            FileWriter outputCov = new FileWriter("OutputCov");
+            FileWriter outputCov = new FileWriter("Covariance");
             for (int x = 0; x < covariance.length; x++) {
                 for (int y = 0; y < 800; y++) {
                     outputCov.append(Double.toString(covariance[x][y]));
@@ -65,7 +98,7 @@ public class Read {
             System.out.println("Exception");
         }
         try {
-            FileWriter output = new FileWriter("Output");
+            FileWriter output = new FileWriter("Correlation");
             for (int x = 0; x < correlation.length; x++) {
                 for (int y = 0; y < correlation[x].length; y++) {
                     output.append(Double.toString(correlation[x][y]));
@@ -138,4 +171,3 @@ public class Read {
 
 
 }
-
